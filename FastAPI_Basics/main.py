@@ -63,7 +63,7 @@ def find_post_data (id):
             return i
         
 
-
+# Creating get request
 @app.get("/posts")
 async def get_posts():
     cur.execute(""" SELECT * FROM posts""")
@@ -73,10 +73,13 @@ async def get_posts():
 
 ## Creating post request
 
-@app.post("/createpost")
-def post_api_test(new_post : Post):
-    print(new_post)
-    return{"new": "new_post"}
+@app.post("posts")
+def post_api_test(post : Post):
+    cur.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """
+                , (post.title, post.content, post.published))
+    new_post=cur.fetchone()
+    conn.commit()
+    return{"new": new_post}
 
 
 ## CRUD operation
